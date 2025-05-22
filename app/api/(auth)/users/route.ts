@@ -95,8 +95,43 @@ export const PUT = async (request: Request) => {
 
 export const DELETE = async (request: Request) => {
   try {
+    // url to get the url of the user
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
+
+    if (!userId) {
+      return new NextResponse(JSON.stringify({ message: "ID not found" }), {
+        status: 400,
+      });
+    }
+
+    if (!Types.ObjectId.isValid(userId)) {
+      return new NextResponse(JSON.stringify({ message: "Invalid User id" }), {
+        status: 400,
+      });
+    }
+
+    await connectDB();
+
+    const deletedUser = await User.findByIdAndDelete(
+      new Types.ObjectId(userId)
+    );
+
+    if (!deletedUser) {
+      return new NextResponse(JSON.stringify({ message: "User not found" }), {
+        status: 400,
+      });
+    }
+
+    return new NextResponse(
+      JSON.stringify({
+        message: "User deleted succeffully",
+        user: deletedUser,
+      }),
+      {
+        status: 200,
+      }
+    );
   } catch (error: any) {
     console.log("Error :", error);
     return new NextResponse("Error deleting user" + error.message, {
