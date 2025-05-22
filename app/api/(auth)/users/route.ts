@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import User from "../../../../lib/modals/user";
 import connectDB from "@/lib/db";
 import { Types } from "mongoose";
+import mongoose from "mongoose";
 
-const ObjectId = require("mongoose").Types.ObjectId;
+const ObjectId = mongoose.Types.ObjectId;
 
 export const GET = async () => {
   try {
@@ -87,6 +88,18 @@ export const PUT = async (request: Request) => {
   } catch (error: any) {
     console.log("Error :", error);
     return new NextResponse("Error updating user" + error.message, {
+      status: 500,
+    });
+  }
+};
+
+export const DELETE = async (request: Request) => {
+  try {
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get("userId");
+  } catch (error: any) {
+    console.log("Error :", error);
+    return new NextResponse("Error deleting user" + error.message, {
       status: 500,
     });
   }
