@@ -74,7 +74,7 @@ export const POST = async (request: Request) => {
 
     const newCategory = new Category({
       title,
-      userId: new Types.ObjectId(userId),
+      user: new Types.ObjectId(userId),
     });
 
     await newCategory.save();
