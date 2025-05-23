@@ -95,7 +95,7 @@ export const PUT = async (request: Request) => {
 
 export const DELETE = async (request: Request) => {
   try {
-    // url to get the url of the user
+    // url to get the id  of the user
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
 
