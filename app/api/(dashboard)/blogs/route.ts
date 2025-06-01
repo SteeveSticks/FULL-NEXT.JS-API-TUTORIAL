@@ -9,9 +9,17 @@ export const GET = async (request: Request) => {
   try {
     const { searchParams } = new URL(request.url);
 
+    // getting userId from the searchParams
     const userId = searchParams.get("userId");
-
+    // getting categoryId from the searchParams
     const categoryId = searchParams.get("categoryId");
+    // filtering by search
+    const searchkeywords = searchParams.get("keyword") as string;
+
+    // for startdate and enddate like the one they use for the forms, scholl start date end date, this is who they pull it out
+
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
 
     if (!userId || !Types.ObjectId.isValid(userId)) {
       return new NextResponse(
@@ -50,7 +58,28 @@ export const GET = async (request: Request) => {
       category: new Types.ObjectId(categoryId),
     };
 
-    // TODO
+    if (searchkeywords) {
+      filter.$or = [
+        { title: { $regex: searchkeywords, $options: "i" } },
+        { description: { $regex: searchkeywords, $options: "i" } },
+      ];
+    }
+
+    if (startDate && endDate) {
+      filter.createdAt = {
+        // opsosite of each other prefect for startDate and endDate: [startDate is when the specified filed is greater than or equals to the provided value], [endDate is the opposite when the specified field | value of the field, the field is less down or eqaul to the value specifed value]
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
+    } else if (startDate) {
+      filter.createdAt = {
+        $gte: new Date(startDate),
+      };
+    } else if (endDate) {
+      filter.createdAt = {
+        $lte: new Date(endDate),
+      };
+    }
 
     const blog = await Blog.find(filter);
 
