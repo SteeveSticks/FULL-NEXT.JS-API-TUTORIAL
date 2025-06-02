@@ -151,8 +151,6 @@ export const POST = async (request: Request) => {
       );
     }
 
-    // TODO
-
     const newBlog = new Blog({
       title,
       description,
