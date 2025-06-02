@@ -17,9 +17,12 @@ export const GET = async (request: Request) => {
     const searchkeywords = searchParams.get("keyword") as string;
 
     // for startdate and enddate like the one they use for the forms, scholl start date end date, this is who they pull it out
-
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
+
+    // pagination
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "10");
 
     if (!userId || !Types.ObjectId.isValid(userId)) {
       return new NextResponse(
@@ -81,7 +84,13 @@ export const GET = async (request: Request) => {
       };
     }
 
-    const blog = await Blog.find(filter);
+    const skip = (page - 1) * limit;
+
+    // to use acending and descending order we want to filter by sort ("asc -> ascending")
+    const blog = await Blog.find(filter)
+      .sort({ createdAt: "asc" })
+      .skip(skip)
+      .limit(limit);
 
     return new NextResponse(JSON.stringify({ blog }), { status: 200 });
   } catch (error: any) {
